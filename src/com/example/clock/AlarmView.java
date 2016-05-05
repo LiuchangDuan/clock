@@ -2,10 +2,15 @@ package com.example.clock;
 
 import java.util.Calendar;
 
+import android.app.AlertDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -35,6 +40,7 @@ public class AlarmView extends LinearLayout {
 		
 		adapter = new ArrayAdapter<AlarmView.AlarmData>(getContext(), android.R.layout.simple_list_item_1);
 		lvAlarmList.setAdapter(adapter);
+		readSavedAlarmList();
 		
 		btnAddAlarm.setOnClickListener(new View.OnClickListener() {
 			
@@ -44,6 +50,36 @@ public class AlarmView extends LinearLayout {
 			}
 		});
 		
+		// 长按弹出（删除）菜单
+		lvAlarmList.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+			@Override
+			public boolean onItemLongClick(AdapterView<?> parent, View view,
+					final int position, long id) {
+				
+				new AlertDialog.Builder(getContext()).setTitle("操作选项").setItems(new CharSequence[]{"删除"}, new DialogInterface.OnClickListener() {
+					
+					@Override
+					public void onClick(DialogInterface dialog, int which) {
+						switch (which) {
+						case 0:
+							deleteAlarm(position);
+							break;
+						default:
+							break;
+						}
+					}
+				}).setNegativeButton("取消", null).show();
+				
+				return true;
+			}
+		});
+		
+	}
+	
+	private void deleteAlarm(int position) {
+		adapter.remove(adapter.getItem(position));
+		saveAlarmList();
 	}
 	
 	
@@ -68,15 +104,47 @@ public class AlarmView extends LinearLayout {
 				}
 				
 				adapter.add(new AlarmData(calendar.getTimeInMillis()));
+				saveAlarmList();
 				
 			}
 		}, c.get(Calendar.HOUR_OF_DAY), c.get(Calendar.MINUTE), true).show();
 	}
 	
+	private void saveAlarmList() {
+		Editor editor = getContext().getSharedPreferences(AlarmView.class.getName(), Context.MODE_PRIVATE).edit();
+		
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < adapter.getCount(); i++) {
+			sb.append(adapter.getItem(i).getTime()).append(",");
+		}
+		
+		String content = sb.toString().substring(0, sb.length() - 1);
+		
+		editor.putString("KEY_ALARM_LIST", content);
+		
+		System.out.println(content);
+		
+		editor.commit();
+	}
+	
+	
+	private void readSavedAlarmList() {
+		SharedPreferences sp = getContext().getSharedPreferences(AlarmView.class.getName(), Context.MODE_PRIVATE);
+		String content = sp.getString(KEY_ALARM_LIST, null);
+		
+		if (content != null) {
+			String[] timeStrings = content.split(",");
+			for (String string : timeStrings) {
+				adapter.add(new AlarmData(Long.parseLong(string)));
+			}
+		}
+		
+	}
 	
 	
 	private Button btnAddAlarm;
 	private ListView lvAlarmList;
+	private static final String KEY_ALARM_LIST = "alarmList";
 	private ArrayAdapter<AlarmData> adapter;
 	
 	private static class AlarmData {
