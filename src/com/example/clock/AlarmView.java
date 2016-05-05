@@ -2,10 +2,13 @@ package com.example.clock;
 
 import java.util.Calendar;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.util.AttributeSet;
@@ -19,16 +22,22 @@ import android.widget.TimePicker;
 
 public class AlarmView extends LinearLayout {
 
-	public AlarmView(Context context, AttributeSet attrs, int defStyleAttr) {
-		super(context, attrs, defStyleAttr);
-	}
+//	public AlarmView(Context context, AttributeSet attrs, int defStyleAttr) {
+//		super(context, attrs, defStyleAttr);
+//	}
 
 	public AlarmView(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		init();
 	}
 
 	public AlarmView(Context context) {
 		super(context);
+		init();
+	}
+	
+	private void init() {
+		alarmManager = (AlarmManager) getContext().getSystemService(Context.ALARM_SERVICE);
 	}
 	
 	@Override
@@ -78,8 +87,12 @@ public class AlarmView extends LinearLayout {
 	}
 	
 	private void deleteAlarm(int position) {
-		adapter.remove(adapter.getItem(position));
+		AlarmData ad = adapter.getItem(position); 
+		adapter.remove(ad);
 		saveAlarmList();
+		
+		alarmManager.cancel(PendingIntent.getBroadcast(getContext(), ad.getId(), new Intent(getContext(), AlarmReceiver.class), 0));
+		
 	}
 	
 	
@@ -96,6 +109,8 @@ public class AlarmView extends LinearLayout {
 				Calendar calendar = Calendar.getInstance();
 				calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
 				calendar.set(Calendar.MINUTE, minute);
+				calendar.set(Calendar.SECOND, 0);
+				calendar.set(Calendar.MILLISECOND, 0);
 				
 				Calendar currentTime = Calendar.getInstance();
 				
@@ -103,7 +118,15 @@ public class AlarmView extends LinearLayout {
 					calendar.setTimeInMillis(calendar.getTimeInMillis() + 24 * 60 * 60 * 1000);
 				}
 				
-				adapter.add(new AlarmData(calendar.getTimeInMillis()));
+				AlarmData ad = new AlarmData(calendar.getTimeInMillis());
+				adapter.add(ad);
+				
+//				adapter.add(new AlarmData(calendar.getTimeInMillis()));
+				// 每隔5分钟再启动一次
+				alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, 
+						ad.getTime(), 
+						5 * 60 * 1000, 
+						PendingIntent.getBroadcast(getContext(), (int)ad.getId(), new Intent(getContext(), AlarmReceiver.class), 0));
 				saveAlarmList();
 				
 			}
@@ -118,12 +141,17 @@ public class AlarmView extends LinearLayout {
 			sb.append(adapter.getItem(i).getTime()).append(",");
 		}
 		
-		String content = sb.toString().substring(0, sb.length() - 1);
+		if (sb.length() > 1) {
+			String content = sb.toString().substring(0, sb.length() - 1);
 		
-		editor.putString("KEY_ALARM_LIST", content);
+			editor.putString("KEY_ALARM_LIST", content);
 		
-		System.out.println(content);
+			System.out.println(content);
 		
+		} else {
+			editor.putString(KEY_ALARM_LIST, null);
+		}
+			
 		editor.commit();
 	}
 	
@@ -146,6 +174,7 @@ public class AlarmView extends LinearLayout {
 	private ListView lvAlarmList;
 	private static final String KEY_ALARM_LIST = "alarmList";
 	private ArrayAdapter<AlarmData> adapter;
+	private AlarmManager alarmManager;
 	
 	private static class AlarmData {
 		public AlarmData(long time) {
@@ -173,6 +202,10 @@ public class AlarmView extends LinearLayout {
 		@Override
 		public String toString() {
 			return getTimeLabel();
+		}
+		
+		public int getId() {
+			return (int)(getTime() / 1000 / 60);
 		}
 		
 		private String timeLabel = "";
