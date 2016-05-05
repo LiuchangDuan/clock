@@ -2,7 +2,6 @@ package com.example.clock;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.Handler;
 import android.widget.TabHost;
 
 
@@ -22,10 +21,19 @@ public class MainActivity extends Activity {
         tabHost.addTab(tabHost.newTabSpec("tabTimer").setIndicator("¼ÆÊ±Æ÷").setContent(R.id.tabTimer));
         tabHost.addTab(tabHost.newTabSpec("tabStopWatch").setIndicator("Ãë±í").setContent(R.id.tabStopWatch));
         
+        stopWatchView = (StopWatchView) findViewById(R.id.tabStopWatch);
+        
     }
     
+    @Override
+    protected void onDestroy() {
+    	
+    	stopWatchView.onDestroy();
+    	
+    	super.onDestroy();
+    }
     
-    
+    private StopWatchView stopWatchView;
     private TabHost tabHost;
 
 }
