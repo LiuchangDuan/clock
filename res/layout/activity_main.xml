@@ -38,7 +38,6 @@
                         android:textAppearance="?android:attr/textAppearanceLarge" />
                 </com.example.clock.TimeView>
 
-                
                 <com.example.clock.AlarmView
                     android:id="@+id/tabAlarm"
                     android:layout_width="match_parent"
@@ -57,15 +56,109 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:text="Add Alarm" />
-                    
                 </com.example.clock.AlarmView>
 
-                <LinearLayout
+                <com.example.clock.TimerView
                     android:id="@+id/tabTimer"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical" >
-                </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:orientation="horizontal" >
+
+                        <EditText
+                            android:id="@+id/etHour"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:inputType="number"
+                            android:singleLine="true"
+                            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=":"
+                            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+                        <EditText
+                            android:id="@+id/etMin"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:inputType="number"
+                            android:singleLine="true"
+                            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=":"
+                            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+                        <EditText
+                            android:id="@+id/etSec"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:inputType="number"
+                            android:singleLine="true"
+                            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=":"
+                            android:textAppearance="?android:attr/textAppearanceLarge" />
+                        
+                    </LinearLayout>
+                    
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:id="@+id/btnGroup"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content" > 
+                        
+                        
+                        <Button 
+                            android:id="@+id/btnStart"
+                            android:text="Start"
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            />
+                        
+                        <Button 
+                            android:id="@+id/btnPause"
+                            android:text="Pause"
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            />
+                        
+                        <Button 
+                            android:id="@+id/btnResume"
+                            android:text="Resume"
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            />
+                        
+                        <Button 
+                            android:id="@+id/btnReset"
+                            android:text="Reset"
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            />
+                        
+                   	</LinearLayout>
+                    
+                </com.example.clock.TimerView>
 
                 <LinearLayout
                     android:id="@+id/tabStopWatch"
